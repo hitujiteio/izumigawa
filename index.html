@@ -340,6 +340,7 @@
   .pm-box { margin-top: 14px; border-top: 1px solid var(--border); padding-top: 10px; }
   .pm-head { font-size: 0.92rem; margin-bottom: 6px; }
   .pm-head small { margin-left: 8px; color: var(--text-muted); font-size: 0.76rem; font-weight: normal; }
+  .pm-rank { font-size: 0.76rem; color: var(--text-muted); margin: 2px 0 0; line-height: 1.5; }
   .pm-map { height: 340px; border-radius: 8px; border: 1px solid var(--border); z-index: 0; }
   .pm-note { font-size: 0.74rem; color: var(--text-muted); margin-top: 6px; line-height: 1.6; }
   .pm-pop { font-size: 0.8rem; line-height: 1.6; }
@@ -851,22 +852,28 @@
     const byPlace = placeIndex.get(name) || new Map();
     const hit = [];
     let total = 0;
-    for (const p of PLACES) {   // 記録の無い地点も灰色で出して、行動範囲がわかるようにする
+    const maxN = Math.max(1, ...PLACES.map(p => (byPlace.get(p.name) || []).length));
+    // 小さい円を後から描いて上に重ねる（大きい円に隠れないように）
+    const order = PLACES.slice().sort((a, b) => (byPlace.get(b.name) || []).length - (byPlace.get(a.name) || []).length);
+    const ranked = [];
+    for (const p of order) {   // 記録の無い地点も灰色で出して、行動範囲がわかるようにする
       const list = byPlace.get(p.name) || [];
       const n = list.length;
       total += n;
+      if (n) ranked.push(`${escHtml(p.name)} ${n}`);
       const style = n
-        ? { radius: 6 + 3.2 * Math.sqrt(n), color: p.est ? '#b45309' : '#1b4332', weight: 2, dashArray: p.est ? '4 3' : null,
+        ? { radius: 4 + 11 * Math.sqrt(n / maxN), color: p.est ? '#b45309' : '#1b4332', weight: 2, dashArray: p.est ? '4 3' : null,
             fillColor: p.est ? '#f59e0b' : '#2d6a4f', fillOpacity: 0.55 }
         : { radius: 3.5, color: '#94a3b8', weight: 1, dashArray: p.est ? '2 2' : null, fillColor: '#cbd5e1', fillOpacity: 0.9 };
       const mk = L.circleMarker([p.lat, p.lon], style).addTo(pmLayer);
       mk.bindTooltip(n ? `${p.name} ${n}記事` : p.name, { direction: 'top' });
       mk.bindPopup(placePopup(p, name, list));
-      if (n) { hit.push([p.lat, p.lon]); mk.bringToFront(); }
+      if (n) hit.push([p.lat, p.lon]);
     }
     head.innerHTML = `<b>${escHtml(name)}の発見場所</b><small>${hit.length
       ? `${hit.length}地点・のべ${total}記事`
-      : '地点名と同じ文に書かれた記事はまだありません'}</small>`;
+      : '地点名と同じ文に書かれた記事はまだありません'}</small>`
+      + (ranked.length ? `<div class="pm-rank">多い順: ${ranked.slice(0, 6).join('・')}${ranked.length > 6 ? ' ほか' : ''}</div>` : '');
     map.invalidateSize();
     if (hit.length >= 2) map.fitBounds(hit, { padding: [28, 28], maxZoom: 16 });
     else if (hit.length === 1) map.setView(hit[0], 16);
