@@ -132,6 +132,14 @@
   header { text-align: center; margin: 16px 0 20px 0; }
   header h1 { font-size: 1.8rem; color: var(--primary-dark); letter-spacing: 1px; margin-bottom: 6px; }
   header p { font-size: 0.92rem; color: var(--text-muted); }
+  header { position: relative; }
+  .wx-btn { position: absolute; top: 0; right: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    width: 46px; height: 46px; border-radius: 50%; background: #fff; border: 1px solid var(--primary-light, #ccc);
+    text-decoration: none; color: var(--text-muted, #666); line-height: 1.05; box-shadow: 0 1px 3px rgba(0,0,0,.12); }
+  .wx-btn:hover { box-shadow: 0 2px 6px rgba(0,0,0,.2); }
+  .wx-btn .wx-ic { font-size: 1.15rem; }
+  .wx-btn .wx-t { font-size: 0.6rem; }
+  @media (max-width: 600px) { header { padding: 0 52px; } }
 
   /* メインレイアウト（外周サイドバー + 中央カレンダー） */
   .main-wrapper {
@@ -364,6 +372,28 @@
   <div class="gallery-ribbon" id="topGallery"></div>
 
   <header>
+    <a class="wx-btn" id="wxBtn" href="https://tenki.jp/forecast/3/17/4610/14100/3hours.html" target="_blank" rel="noopener" title="横浜市の3時間天気（tenki.jp）を開く" aria-label="横浜市の3時間天気を開く"><span class="wx-ic" id="wxIc">🌤</span><span class="wx-t" id="wxT">天気</span></a>
+    <script>
+    (function(){
+      var ICON = function(c){ if(c===0) return '☀️'; if(c<=2) return '🌤'; if(c===3) return '☁️'; if(c===45||c===48) return '🌫';
+        if(c>=51&&c<=67) return '🌧'; if(c>=71&&c<=77) return '❄️'; if(c>=80&&c<=82) return '🌦'; if(c>=85&&c<=86) return '🌨'; if(c>=95) return '⛈'; return '🌤'; };
+      var WORD = function(c){ if(c===0) return '快晴'; if(c<=2) return '晴れ'; if(c===3) return 'くもり'; if(c===45||c===48) return '霧';
+        if(c>=51&&c<=67) return '雨'; if(c>=71&&c<=77) return '雪'; if(c>=80&&c<=82) return 'にわか雨'; if(c>=85&&c<=86) return '雪'; if(c>=95) return '雷雨'; return ''; };
+      fetch('https://api.open-meteo.com/v1/forecast?latitude=35.4437&longitude=139.638&hourly=weather_code,temperature_2m,precipitation_probability&timezone=Asia%2FTokyo&forecast_days=2')
+        .then(function(r){ return r.json(); }).then(function(d){
+          var h = d.hourly, now = new Date(), p = function(n){ return (n<10?'0':'')+n; };
+          var key = now.getFullYear()+'-'+p(now.getMonth()+1)+'-'+p(now.getDate())+'T'+p(now.getHours())+':00';
+          var i = h.time.indexOf(key); if (i < 0) return;
+          document.getElementById('wxIc').textContent = ICON(h.weather_code[i]);
+          document.getElementById('wxT').textContent = Math.round(h.temperature_2m[i]) + '°';
+          var tip = ['横浜 3時間ごと（タップでtenki.jp）'];
+          for (var k=0; k<=6 && i+k<h.time.length; k+=3) {
+            tip.push(h.time[i+k].slice(11,16)+' '+WORD(h.weather_code[i+k])+' '+Math.round(h.temperature_2m[i+k])+'° 降水'+h.precipitation_probability[i+k]+'%');
+          }
+          document.getElementById('wxBtn').title = tip.join('\n');
+        }).catch(function(){});
+    })();
+    </script>
     <h1>kataroのつぶやき</h1>
     <p>和泉川の四季の生き物・植物 歳時記カレンダー（2004年〜2026年 同日アーカイブ）<br><small>外周の写真は1時間ごとに入れ替わります</small></p>
   </header>
