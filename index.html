@@ -133,13 +133,14 @@
   header h1 { font-size: 1.8rem; color: var(--primary-dark); letter-spacing: 1px; margin-bottom: 6px; }
   header p { font-size: 0.92rem; color: var(--text-muted); }
   header { position: relative; }
-  .wx-btn { position: absolute; top: 0; right: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
-    width: 46px; height: 46px; border-radius: 50%; background: #fff; border: 1px solid var(--primary-light, #ccc);
-    text-decoration: none; color: var(--text-muted, #666); line-height: 1.05; box-shadow: 0 1px 3px rgba(0,0,0,.12); }
-  .wx-btn:hover { box-shadow: 0 2px 6px rgba(0,0,0,.2); }
-  .wx-btn .wx-ic { font-size: 1.15rem; }
-  .wx-btn .wx-t { font-size: 0.6rem; }
-  @media (max-width: 600px) { header { padding: 0 52px; } }
+  .wx-btn { position: absolute; top: -4px; right: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    width: 68px; height: 68px; border-radius: 50%; background: linear-gradient(160deg, #4aa8ff, #1d6fd8); border: 2px solid #fff;
+    text-decoration: none; color: #fff; line-height: 1.1; box-shadow: 0 3px 10px rgba(29,111,216,.45); }
+  .wx-btn:hover { transform: translateY(-1px); box-shadow: 0 5px 14px rgba(29,111,216,.6); }
+  .wx-btn .wx-ic { font-size: 1.7rem; }
+  .wx-btn .wx-t { font-size: 0.78rem; font-weight: 700; }
+  .wx-btn .wx-l { font-size: 0.58rem; opacity: .9; }
+  @media (max-width: 600px) { header { padding: 0 76px 0 0; } }
 
   /* メインレイアウト（外周サイドバー + 中央カレンダー） */
   .main-wrapper {
@@ -372,7 +373,7 @@
   <div class="gallery-ribbon" id="topGallery"></div>
 
   <header>
-    <a class="wx-btn" id="wxBtn" href="https://tenki.jp/forecast/3/17/4610/14100/3hours.html" target="_blank" rel="noopener" title="横浜市の3時間天気（tenki.jp）を開く" aria-label="横浜市の3時間天気を開く"><span class="wx-ic" id="wxIc">🌤</span><span class="wx-t" id="wxT">天気</span></a>
+    <a class="wx-btn" id="wxBtn" href="https://tenki.jp/forecast/3/17/4610/14100/3hours.html" target="_blank" rel="noopener" title="横浜市の3時間天気（tenki.jp）を開く" aria-label="横浜市の3時間天気を開く"><span class="wx-ic" id="wxIc">🌤</span><span class="wx-t" id="wxT">--°</span><span class="wx-l">横浜の天気</span></a>
     <script>
     (function(){
       var ICON = function(c){ if(c===0) return '☀️'; if(c<=2) return '🌤'; if(c===3) return '☁️'; if(c===45||c===48) return '🌫';
